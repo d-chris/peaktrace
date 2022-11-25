@@ -6,7 +6,15 @@ Download: [Homepage](https://www.peak-system.com/) > Support > Downloads > Docum
 
 - [PEAK-System file format specification](#peak-system-file-format-specification)
   - [CAN trace files](#can-trace-files)
+    - [CAN Version 1.0](#can-version-10)
+    - [CAN Version 1.1](#can-version-11)
+    - [CAN Version 1.2](#can-version-12)
+    - [CAN Version 1.3](#can-version-13)
+    - [CAN Version 2.0](#can-version-20)
+    - [CAN Version 2.1](#can-version-21)
   - [LIN trace files](#lin-trace-files)
+    - [LIN Version 1.0](#lin-version-10)
+    - [LIN Version 1.1](#lin-version-11)
 
 ## CAN trace files
 
