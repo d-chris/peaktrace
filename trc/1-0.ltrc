@@ -1,0 +1,54 @@
+;$FILEVERSION=1.0 
+;$STARTTIME=8708618495 
+; 
+;   C:\TraceFile.ltrc 
+; 
+;   Start time: 26.03.2010 11:06:08 
+;   PLIN-Net: 
+;    
+;   Direction description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     Pub   = Publisher Frame 
+;     Sub   = Subscriber Frame 
+;     SubAL = Subscriber Auto Length Frame 
+;    
+;   Checksum Type description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     CL = Classic 
+;     EH = Enhanced 
+;     AU = Auto 
+;    
+;   Error Code description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     CK = Checksum Error 
+;     GS = GroundShort Error 
+;     P0 = IdParityBit0 Error 
+;     P1 = IdParityBit1 Error 
+;     IS = InconsistentSynch Error 
+;     SR = SlaveNOtResponding Error 
+;     SD = SlotDelay Error 
+;     TO = Timeout Error 
+;     VS = VBatShort Error 
+;    
+;   Columns decription: 
+;   ~~~~~~~~~~~~~~~~~~~~ 
+;   +Frame Number 
+;   |           +Timestamp (microseconds) 
+;   |           |           +Direction 
+;   |           |           |    +Frame-ID (hex) 
+;   |           |           |    |   +Frame Length 
+;   |           |           |    |   |   +Data bytes (hex) 
+;   |           |           |    |   |   |                       +Checksum 
+;   |           |           |    |   |   |                       |   +Checksum Type 
+;   |           |           |    |   |   |                       |   |     +Error Code 
+;   |           |           |    |   |   |                       |   |     | 
+;---+--   ------+-------  --+--  +-  +  -+ -- -- -- -- -- -- --  +-  +-  -+----------- 
+     1)            11307   Pub   05  2  00 00                    7A  EH   
+     2)            36305   Sub   02  2  -- --                    00  EH  SR/TO  
+     3)            61305   Sub   07  8  -- -- -- -- -- -- -- --  00  EH  SR/TO 
+     4)            86305   Pub   05  2  00 00                    7A  EH   
+     5)           111304   Sub   02  2  -- --                    00  EH  SR/TO  
+     6)           136303   Sub   07  8  C1 38 FE FF 3F F0 3E 6D  FC  EH  Ck 
+     7)           161304   Pub   05  2  00 00                    7A  EH   
+     8)           186302   Sub   02  2  FC 7F                    41  EH
+	 

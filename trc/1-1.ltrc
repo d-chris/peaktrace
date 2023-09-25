@@ -1,0 +1,52 @@
+;$FILEVERSION=1.1 
+;$STARTTIME=40694.6971444676 
+; 
+;   C:\TraceFile.ltrc 
+; 
+;   Start time: 2011-05-31 16:43:53.282 
+;    
+;   Direction description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     Pub   = Publisher Frame 
+;     Sub   = Subscriber Frame 
+;     SubAL = Subscriber Auto Length Frame 
+;    
+;   Checksum Type description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     CL = Classic 
+;     EH = Enhanced 
+;     AU = Auto 
+;    
+;   Error Code description: 
+;   ~~~~~~~~~~~~~~~~~~ 
+;     CK = Checksum Error 
+;     GS = GroundShort Error 
+;     P0 = IdParityBit0 Error 
+;     P1 = IdParityBit1 Error 
+;     IS = InconsistentSynch Error 
+;     SR = SlaveNOtResponding Error 
+;     SD = SlotDelay Error 
+;     TO = Timeout Error 
+;     VS = VBatShort Error 
+;    
+;   Columns decription: 
+;   ~~~~~~~~~~~~~~~~~~~~ 
+;   +Frame Number 
+;   |           +Timestamp (microseconds) 
+;   |           |           +Direction 
+;   |           |           |    +Frame-ID (hex) 
+;   |           |           |    |   +Frame Length 
+;   |           |           |    |   |   +Data bytes (hex) 
+;   |           |           |    |   |   |                       +Checksum (hex) 
+;   |           |           |    |   |   |                       |   +Checksum Type 
+;   |           |           |    |   |   |                       |   |    +Error Code 
+;   |           |           |    |   |   |                       |   |    | 
+;---+--   ------+-------  --+--  +-  +  -+ -- -- -- -- -- -- --  +-  +-  -+----------- 
+     1)           756186   Sub   02  2  -- --                    00  EH  SR/TO 
+     2)           781185   Sub   01  8  -- -- -- -- -- -- -- --  00  EH  SR/TO 
+     3)           806186   Pub   05  2  00 00                    7A  EH   
+     4)           831184   Sub   02  2  -- --                    00  EH  SR/TO 
+     5)           856183   Sub   01  8  C1 38 FE FF 3F F0 3E 6D  FC  EH  CK 
+     6)           881183   Pub   05  2  00 00                    7A  EH   
+     7)           906182   Sub   02  2  FC 7F                    41  EH  
+     8)           931181   Sub   01  8  C1 38 FE FF 3F F0 E6 6A  C3  EH 
