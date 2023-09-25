@@ -1,6 +1,5 @@
 import itertools
 import re
-from pathlib import Path
 
 
 class CanTrace:
@@ -27,6 +26,7 @@ class CanTrace:
 
     @property
     def version(self):
+        """file version of the trace"""
         return self._version
 
     @classmethod
@@ -45,7 +45,12 @@ class CanTrace:
                 if line.startswith(';'):
                     continue
 
-                yield self.parse(line.split())
+                items = line.split()
+
+                if not items:
+                    continue
+
+                yield self.parse(items)
 
     @staticmethod
     def fileversion(file: str):
@@ -57,6 +62,9 @@ class CanTrace:
             try:
                 return match.group(0)
             except AttributeError:
+                if not s.startswith(';###'):
+                    raise ValueError('File version not found')
+
                 return '1.0'
 
     @staticmethod
