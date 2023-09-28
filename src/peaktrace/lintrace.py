@@ -21,8 +21,13 @@ class LinTrace:
 
         obj._filename = filename
         obj._version = version
+        obj._format = 'lin'
 
         return obj
+
+    @property
+    def format(self):
+        return self._format
 
     @property
     def version(self):

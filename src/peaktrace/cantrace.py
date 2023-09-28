@@ -21,8 +21,13 @@ class CanTrace:
 
         obj._filename = filename
         obj._version = version
+        obj._format = 'can'
 
         return obj
+
+    @property
+    def format(self):
+        return self._format
 
     @property
     def version(self):
@@ -38,6 +43,19 @@ class CanTrace:
     def is_msg(cls, msg):
         """returns False if msg is an error message or a remote request"""
         raise NotImplementedError
+
+    def expand(self, msg):
+        """expand all dictionary values that are lists into multiple keys"""
+        m = msg.copy()
+
+        for key, value in msg.items():
+            if not isinstance(value, list):
+                continue
+
+            for i, item in enumerate(m.pop(key)):
+                m[f'{key}{i:02d}'] = item
+
+        return m
 
     def __iter__(self):
         with open(self._filename, 'r') as f:
