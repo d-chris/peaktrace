@@ -24,8 +24,10 @@ def convert(filename: str, output: str = None):
 
     trc = PeakTrace(filename)
 
+    header = []
+
     with open(output, 'wt', newline='') as f:
         writer = csv.DictWriter(
-            f, fieldnames=trc.keys(), quoting=csv.QUOTE_ALL, extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(map(trc.expand, trc))
+            f, fieldnames=header, quoting=csv.QUOTE_ALL, extrasaction='ignore')
+        # writer.writeheader()
+        writer.writerows(filter(trc.is_msg, trc))
