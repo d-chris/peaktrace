@@ -86,11 +86,44 @@ class CanTrace:
                 return '1.0'
 
     @staticmethod
-    def islice(iterable, n=None):
+    def islice(iterable, n: int = None):
         return itertools.islice(iterable, n)
+
+    @classmethod
+    def _key_data(cls, expand: bool = False) -> tuple[str]:
+        """return the column header for data"""
+        if expand:
+            return tuple(f'DATA{i:02d}' for i in range(cls.DATA_MAX))
+
+        return ('DATA',)
+
+    @classmethod
+    def _key_error(cls, expand: bool = False) -> tuple[str]:
+        """return the column header for error"""
+        if expand:
+            return tuple(f'ERROR{i:02d}' for i in range(cls.ERROR_MAX))
+
+        return ('ERROR',)
+
+    @classmethod
+    def keys(cls, expand: bool = False) -> tuple[str]:
+        """return the keys of the message dictionary"""
+        raise NotImplementedError
 
 
 class CanTrace10(CanTrace, version='1.0'):
+    DATA_MAX = 8
+    ERROR_MAX = 4
+
+    @classmethod
+    def keys(cls, expand=False):
+        return (
+            '#',
+            'TIMESTAMP',
+            'ID',
+            'LENGTH',
+        ) + cls._key_data(expand) + cls._key_error(expand) + ('EVENT',)
+
     @classmethod
     def parse(cls, line: list[str]):
         reader = iter(line)
@@ -130,6 +163,16 @@ class CanTrace10(CanTrace, version='1.0'):
 
 class CanTrace11(CanTrace10, version='1.1'):
     @classmethod
+    def keys(cls, expand=False):
+        return (
+            '#',
+            'TIMESTAMP',
+            'TYPE',
+            'ID',
+            'LENGTH',
+        ) + cls._key_data(expand) + cls._key_error(expand) + ('EVENT',)
+
+    @classmethod
     def parse(cls, line: list[str]):
 
         reader = iter(line)
@@ -149,6 +192,17 @@ class CanTrace11(CanTrace10, version='1.1'):
 
 
 class CanTrace12(CanTrace11, version='1.2'):
+    @classmethod
+    def keys(cls, expand=False):
+        return (
+            '#',
+            'TIMESTAMP',
+            'BUS',
+            'TYPE',
+            'ID',
+            'LENGTH',
+        ) + cls._key_data(expand) + cls._key_error(expand) + ('EVENT',)
+
     @classmethod
     def parse(cls, line: list[str]):
 
@@ -189,6 +243,20 @@ class CanTrace13(CanTrace12, version='1.3'):
 
 
 class CanTrace20(CanTrace, version='2.0'):
+    DATA_MAX = 64
+    ERROR_MAX = 5
+
+    @classmethod
+    def keys(cls, expand=False):
+        return (
+            '#',
+            'TIMESTAMP',
+            'TYPE',
+            'ID',
+            'DIRECTION',
+            'LENGTH',
+        ) + cls._key_data(expand) + cls._key_error(expand)
+
     @classmethod
     def parse(cls, line: list[str]):
 
@@ -217,6 +285,18 @@ class CanTrace20(CanTrace, version='2.0'):
 
 
 class CanTrace21(CanTrace20, version='2.1'):
+    @classmethod
+    def keys(cls, expand=False):
+        return (
+            '#',
+            'TIMESTAMP',
+            'TYPE',
+            'BUS',
+            'ID',
+            'DIRECTION',
+            'LENGTH',
+        ) + cls._key_data(expand) + cls._key_error(expand) + ('EVENT',)
+
     @classmethod
     def parse(cls, line: list[str]):
 
