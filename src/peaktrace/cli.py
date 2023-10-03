@@ -1,0 +1,53 @@
+import csv
+import os
+import time
+from pathlib import Path
+
+from .peaktrace import PeakTrace
+
+
+def convert(filename: str, output: str = None, force: bool = False) -> Path:
+    """converts a trace file into a csv file"""
+
+    output = output or Path(filename).with_suffix('.csv')
+
+    if Path(output).is_file():
+        if not force:
+            raise FileExistsError(f'File {output} already exists')
+
+    trc = PeakTrace(filename)
+
+    header = trc.keys(True)
+
+    with open(output, 'wt', newline='') as f:
+        writer = csv.DictWriter(
+            f, fieldnames=header, quoting=csv.QUOTE_ALL, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(map(trc.expand, trc))
+
+    return Path(output)
+
+
+def console(filename: str, sleep: float = None, tail: bool = False) -> dict:
+    if sleep is None:
+        sleep = 1.0
+
+    trc = PeakTrace(filename)
+
+    with open(filename, mode='r') as f:
+        if tail:
+            f.seek(0, os.SEEK_END)
+
+        while True:
+            line = f.readline()
+
+            if line.startswith(';'):
+                continue
+
+            itmes = line.split()
+
+            if not itmes:
+                time.sleep(sleep)
+                continue
+
+            yield trc.parse(itmes)
