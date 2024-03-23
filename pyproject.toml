@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "peaktrace"
 version = "0.0.0"
-description = ""
+description = "read peak-system can and lin trace files"
 authors = ["Christoph Dörrer <d-chris@web.de>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">3.8.1,<3.13"
