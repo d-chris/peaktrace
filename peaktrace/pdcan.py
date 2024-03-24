@@ -22,7 +22,7 @@ def PeakFrame(filename, **kwargs) -> pd.DataFrame:
     Data bytes are integer in 'little' and 'big' endianess.
     """
 
-    df = read_trace(filename, **kwargs).can.get_messages().reset_index(drop=True)
+    df = read_trace(filename, **kwargs).can.get_messages()
 
     data = to_int(df.filter(regex=r"D\d+"))
 
@@ -50,12 +50,12 @@ def to_int(df: pd.DataFrame, columns: List[str] = None) -> pd.DataFrame:
         hexstr = bytes.fromhex("".join(s for s in hexlist if s))
         return (int.from_bytes(hexstr, "little"), int.from_bytes(hexstr, "big"))
 
-    df = df.fillna("").values.tolist()
+    data = df.fillna("").values.tolist()
 
     if columns is None:
         columns = ["Little", "Big"]
 
-    return pd.DataFrame(map(hextoint, iter(df)), columns=columns)
+    return pd.DataFrame(map(hextoint, iter(data)), columns=columns, index=df.index)
 
 
 class CanCsv:
@@ -170,14 +170,13 @@ class CanCsv:
                 dtype=str,
             )
             .dropna(axis=1, how="all")
-            .reset_index(drop=True)
             .astype(
                 {
                     "Time": "float",
                     "Bus": "uint8",
                     "Direction": "category",
                     "Type": "category",
-                    "Length": "category",
+                    "Length": "uint8",
                 }
             )
         )
@@ -186,28 +185,31 @@ class CanCsv:
 @pd.api.extensions.register_dataframe_accessor("can")
 class CanCsvAccessor(CanCsv):
 
-    def __init__(self, pandas_obj):
-        self._validate(pandas_obj)
+    def __init__(self, pandas_obj: pd.DataFrame) -> None:
         self._df = pandas_obj
 
-    @staticmethod
-    def _validate(obj):
-        pass
-
     @property
-    def is_canfd(self):
+    def is_canfd(self) -> bool:
+        """True when the DataFrame contains CAN FD messages."""
+
         return self._df["Type"].isin(self.type_fd).any()
 
-    def get_messages(self, msgtype: List[str] = None):
+    def get_messages(self, msgtype: List[str] = None) -> pd.DataFrame:
         """return entries containing a can or canfd message."""
+
         return self._df[self._df["Type"].isin(msgtype or self.type_data)]
 
-    def get_id(self, id: int, extended: bool = False):
-        """get all entries for a given identifier."""
+    def get_id(self, id: int, extended: bool = False, bus: int = None) -> pd.DataFrame:
+        """get all entries for a given identifier from a bus."""
 
-        return self._df[self._df["ID"] == id]
+        expr = f"ID == '{Id(id, extended)}'"
 
-    def get_bus(self, bus: int):
+        if bus is not None:
+            expr = f"Bus == {bus} and {expr}"
+
+        return self._df.query(expr)
+
+    def get_bus(self, bus: int) -> pd.DataFrame:
         """get all entries for a given bus."""
 
         return self._df[self._df["Bus"] == bus]
