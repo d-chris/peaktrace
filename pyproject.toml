@@ -20,6 +20,23 @@ name = "testpypi"
 url = "https://test.pypi.org/legacy/"
 priority = "explicit"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = "tests"
+addopts = [
+    "--color=yes",
+    "-s",
+    # "--random-order",
+    # "--cov=peaktrace",
+    # "--cov-report=term-missing:skip-covered",
+    # "--cov-append",
+    # "--cov-report=html",
+]
