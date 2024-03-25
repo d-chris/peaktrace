@@ -8,12 +8,12 @@ from pathlibutil import Path
 
 
 def read_trace(filename, **kwargs) -> pd.DataFrame:
-    """Reads a Peak Can .trc or .csv file and returns a pandas.DataFrame."""
+    """Reads a PEAK Can .csv or trace file and returns a pandas.DataFrame."""
 
-    if Path(filename).suffix == ".trc":
-        return CanCsv.read_trc(filename, **kwargs)
+    if Path(filename).suffix.casefold() == ".csv":
+        return CanCsv.read_csv(filename, **kwargs)
 
-    return CanCsv.read_csv(filename, **kwargs)
+    return CanCsv.read_trc(filename, **kwargs)
 
 
 def PeakFrame(filename, **kwargs) -> pd.DataFrame:
@@ -22,7 +22,7 @@ def PeakFrame(filename, **kwargs) -> pd.DataFrame:
     Data bytes are integer in 'little' and 'big' endianess.
     """
 
-    df = read_trace(filename, **kwargs).can.get_messages()
+    df = read_trace(filename, **kwargs).can.get_type()
 
     data = to_int(df.filter(regex=r"D\d+"))
 
@@ -74,7 +74,7 @@ class CanCsv:
         ] + [f"D{i}" for i in range(databytes)]
 
     @property
-    def type_fd(self):
+    def type_fd(self) -> List[str]:
         """CAN FD message types containing data."""
         return [
             "FD",
@@ -84,19 +84,20 @@ class CanCsv:
         ]
 
     @property
-    def type_can(self):
-        """CAN message types containing data."""
+    def type_can(self) -> List[str]:
+        """CAN message types containing can or lin data."""
         return [
             "DT",
         ]
 
     @property
-    def type_data(self):
+    def type_data(self) -> List[str]:
         """Message types containing data."""
         return self.type_can + self.type_fd
 
     @property
-    def type_error(self):
+    def type_info(self) -> List[str]:
+        """Message types containing status and error information."""
         return [
             "ST",
             "ER",
@@ -194,10 +195,10 @@ class CanCsvAccessor(CanCsv):
 
         return self._df["Type"].isin(self.type_fd).any()
 
-    def get_messages(self, msgtype: List[str] = None) -> pd.DataFrame:
+    def get_type(self, type: List[str] = None) -> pd.DataFrame:
         """return entries containing a can or canfd message."""
 
-        return self._df[self._df["Type"].isin(msgtype or self.type_data)]
+        return self._df[self._df["Type"].isin(type or self.type_data)]
 
     def get_id(self, id: int, extended: bool = False, bus: int = None) -> pd.DataFrame:
         """get all entries for a given identifier from a bus."""
@@ -205,7 +206,7 @@ class CanCsvAccessor(CanCsv):
         expr = f"ID == '{Id(id, extended)}'"
 
         if bus is not None:
-            expr = f"Bus == {bus} and {expr}"
+            expr = f"Bus == {int(bus)} and {expr}"
 
         return self._df.query(expr)
 

@@ -2,7 +2,7 @@ from .cantrace import CanTrace
 from .lintrace import LinTrace
 from .peaktrace import PeakTrace
 from .cli import convert, console
-from .pdcan import read_trace
+from .pdcan import read_trace, PeakFrame
 
 __all__ = [
     "CanTrace",
@@ -11,4 +11,5 @@ __all__ = [
     "convert",
     "console",
     "read_trace",
+    "PeakFrame",
 ]

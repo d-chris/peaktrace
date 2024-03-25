@@ -5,11 +5,13 @@ description = "read peak-system can and lin trace files"
 authors = ["Christoph Dörrer <d-chris@web.de>"]
 readme = "README.md"
 license = "MIT"
+include = ["peaktrace/bin/*"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 pathlibutil = "^0.1.5"
-pandas = "^2.2.1"
+pandas = {extras = ["performance", "pyarrow"], version = "^2.2.1"}
+
 
 [[tool.poetry.source]]
 name = "PyPI"
@@ -20,9 +22,11 @@ name = "testpypi"
 url = "https://test.pypi.org/legacy/"
 priority = "explicit"
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
+
+[tool.poetry.group.jupyter.dependencies]
+notebook = "^7.1.2"
 
 [build-system]
 requires = ["poetry-core"]

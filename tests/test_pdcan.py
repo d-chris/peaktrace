@@ -54,6 +54,6 @@ def test_id_default(id, result):
 
 
 def test_peakframe():
-    df = PeakFrame("./examples/csv/2-1_308.trc.csv")
+    df = PeakFrame("./examples/csv/2-1.trc.csv")
 
     assert isinstance(df, pd.DataFrame)
