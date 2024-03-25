@@ -1,3 +1,4 @@
+import functools
 import os
 import subprocess
 from tempfile import TemporaryDirectory
@@ -53,9 +54,14 @@ def to_int(df: pd.DataFrame, columns: List[str] = None) -> pd.DataFrame:
     data = df.fillna("").values.tolist()
 
     if columns is None:
-        columns = ["Little", "Big"]
+        columns = ["little", "big"]
 
-    return pd.DataFrame(map(hextoint, iter(data)), columns=columns, index=df.index)
+    return pd.DataFrame(map(hextoint, data), columns=columns, index=df.index)
+
+
+def get_signal(data: int, start_bit: int, bit_length: int) -> int:
+    """get a signal from a data."""
+    return (data >> start_bit) & ((2**bit_length) - 1)
 
 
 class CanCsv:
@@ -214,3 +220,31 @@ class CanCsvAccessor(CanCsv):
         """get all entries for a given bus."""
 
         return self._df[self._df["Bus"] == bus]
+
+    def get_signal(
+        self,
+        start_bit: int,
+        bit_length: int,
+        byteorder: str = "little",
+        inplace: bool = False,
+    ) -> pd.Series:
+
+        data = self._df[byteorder].values.tolist()
+        func = functools.partial(get_signal, start_bit=start_bit, bit_length=bit_length)
+        name = f"{byteorder}({start_bit},{bit_length})"
+
+        d = pd.Series(
+            map(func, data),
+            index=self._df.index,
+            name=name,
+        )
+
+        if inplace is False:
+            return d
+
+        if isinstance(inplace, str):
+            self._df[inplace] = d
+        else:
+            self._df[d.name] = d
+
+        return d
