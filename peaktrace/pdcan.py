@@ -4,6 +4,7 @@ import subprocess
 from tempfile import TemporaryDirectory
 from typing import List, Tuple
 
+import numpy as np
 import pandas as pd
 from pathlibutil import Path
 
@@ -57,6 +58,41 @@ def to_int(df: pd.DataFrame, columns: List[str] = None) -> pd.DataFrame:
         columns = ["little", "big"]
 
     return pd.DataFrame(map(hextoint, data), columns=columns, index=df.index)
+
+
+def diff(d: pd.Series, bits: int = 8, invalid: List[int] = None) -> pd.Series:
+    """
+    Calculate the difference between pulses and handle overflows for the number of bits
+    and invalid values.
+    """
+
+    def to_type(bits: int) -> np.dtype:
+        """Return the smallest numpy data type for a given number of bits."""
+        if bits <= 8:
+            return np.uint8
+        if bits <= 16:
+            return np.uint16
+        if bits <= 32:
+            return np.uint32
+        return np.uint64
+
+    if invalid is None:
+        invalid = []
+
+    # remove invalid values from series
+    p = d[~d.isin(invalid)]
+
+    # calculate difference and create a new series where overflows occured
+    diff = (p - p.shift(1)).dropna()
+    ovfl = np.where(diff < 0, len(invalid), 0)
+
+    # mask to stay in n-bits range
+    diff %= 2**bits
+
+    # correction for overflows
+    p: pd.Series = diff - ovfl
+
+    return p.astype(to_type(bits))
 
 
 def get_signal(data: int, start_bit: int, bit_length: int) -> int:
