@@ -9,6 +9,36 @@ import pandas as pd
 from pathlibutil import Path
 
 
+def dataframe_parquet(func=None, /, subdir=None):
+    if func is None:
+        return functools.partial(dataframe_parquet, subdir=subdir)
+
+    @functools.wraps(func)
+    def wrapper(file, *args, **kwargs):
+
+        filename = Path(file)
+
+        hash = filename.hexdigest("blake2s")
+
+        if subdir is None:
+            parquet = filename.parent / hash
+        else:
+            parquet = filename.parent / subdir / hash
+
+        if parquet.is_file():
+            df = pd.read_parquet(parquet)
+        else:
+            df = func(file, *args, **kwargs)
+
+            parquet.parent.mkdir(parents=True, exist_ok=True)
+            df.to_parquet(parquet)
+
+        return df
+
+    return wrapper
+
+
+@dataframe_parquet(subdir="__parquet__")
 def read_trace(filename, **kwargs) -> pd.DataFrame:
     """Reads a PEAK Can .csv or trace file and returns a pandas.DataFrame."""
 
@@ -66,7 +96,7 @@ def diff(d: pd.Series, bits: int = 8, invalid: List[int] = None) -> pd.Series:
     and invalid values.
     """
 
-    def to_type(bits: int) -> np.dtype:
+    def uint(bits: int) -> np.dtype:
         """Return the smallest numpy data type for a given number of bits."""
         if bits <= 8:
             return np.uint8
@@ -92,7 +122,7 @@ def diff(d: pd.Series, bits: int = 8, invalid: List[int] = None) -> pd.Series:
     # correction for overflows
     p: pd.Series = diff - ovfl
 
-    return p.astype(to_type(bits))
+    return p.astype(uint(bits))
 
 
 def get_signal(data: int, start_bit: int, bit_length: int) -> int:
@@ -225,6 +255,20 @@ class CanCsv:
         )
 
 
+@pd.api.extensions.register_series_accessor("can")
+class CanSeriesAccessor:
+    def __init__(self, pandas_obj: pd.Series) -> None:
+        self._s = pandas_obj
+
+    def diff(self, bits: int = 8, invalid: List[int] = None) -> pd.Series:
+        """Calculate the difference between pulses and handle overflows."""
+        return diff(self._s, bits=bits, invalid=invalid)
+
+    def signal(self, start_bit: int, bit_length: int) -> pd.Series:
+        """get a signal from a data."""
+        return self._s.apply(get_signal, start_bit=start_bit, bit_length=bit_length)
+
+
 @pd.api.extensions.register_dataframe_accessor("can")
 class CanCsvAccessor(CanCsv):
 
@@ -284,3 +328,7 @@ class CanCsvAccessor(CanCsv):
             self._df[d.name] = d
 
         return d
+
+    def diff(self, column: str, bits: int = 8, invalid: List[int] = None) -> pd.Series:
+        """Calculate the difference between pulses and handle overflows."""
+        return diff(self._df[column], bits=bits, invalid=invalid)

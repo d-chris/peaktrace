@@ -10,7 +10,7 @@ include = ["peaktrace/bin/*"]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 pathlibutil = "^0.1.5"
-pandas = {extras = ["performance", "pyarrow"], version = "^2.2.1"}
+pandas = { extras = ["performance", "pyarrow", "plot"], version = "^2.2.1" }
 
 
 [[tool.poetry.source]]
