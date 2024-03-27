@@ -258,6 +258,8 @@ class CanCsv:
 @pd.api.extensions.register_series_accessor("can")
 class CanSeriesAccessor:
     def __init__(self, pandas_obj: pd.Series) -> None:
+        if not np.issubdtype(pandas_obj.dtype, np.integer):
+            raise TypeError("Series must be of type int or its subtypes like np.uint8.")
         self._s = pandas_obj
 
     def diff(self, bits: int = 8, invalid: List[int] = None) -> pd.Series:
@@ -266,7 +268,10 @@ class CanSeriesAccessor:
 
     def signal(self, start_bit: int, bit_length: int) -> pd.Series:
         """get a signal from a data."""
-        return self._s.apply(get_signal, start_bit=start_bit, bit_length=bit_length)
+
+        func = functools.partial(get_signal, start_bit=start_bit, bit_length=bit_length)
+
+        return self._s.map(func)
 
 
 @pd.api.extensions.register_dataframe_accessor("can")
