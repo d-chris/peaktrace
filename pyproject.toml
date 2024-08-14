@@ -10,7 +10,6 @@ description = "read peak-system can and lin trace files"
 authors = [ "Christoph Dörrer <d-chris@web.de>" ]
 readme = "README.md"
 license = "MIT"
-include = [ "peaktrace/bin/*" ]
 classifiers = [
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
@@ -19,6 +18,10 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "License :: OSI Approved :: MIT License",
   "Operating System :: Microsoft :: Windows",
+]
+include = [
+  "bin/*.exe",
+  "bin/*.dll",
 ]
 
 [tool.poetry.dependencies]

@@ -28,8 +28,6 @@ class Pendulum:
         """
         Parse a timestamp and return a pendulum instance
         """
-        if timestamp is None:
-            return None
 
         try:
             return pendulum.parse(timestamp)
@@ -43,14 +41,11 @@ class Pendulum:
         """
         match = cls.regex.search(timestamp)
 
-        try:
-            return pendulum.from_format(
-                match.group("time"),
-                cls.format,
-                tz=match.group("tz"),
-            )
-        except AttributeError:
-            return pendulum.parse(match.group("time"))
+        return pendulum.from_format(
+            match.group("time"),
+            cls.format,
+            tz=match.group("tz"),
+        )
 
 
 def modified(
@@ -86,7 +81,7 @@ def download(
     Download a zip file from the given url into a temporary directory
     """
 
-    chunk = 4096
+    chunk = 8192
 
     with NamedTemporaryFile(delete=False, buffering=chunk, suffix=".zip") as file:
         response = requests.get(url, stream=True)
@@ -112,7 +107,7 @@ def unpack(file: Path, destination: str = None) -> Path:
     except Exception:
         return None
     finally:
-        file.unlink()
+        file.unlink(missing_ok=True)
 
 
 def load(file: str) -> dict:
@@ -130,13 +125,18 @@ def write(data: dict, file: str) -> None:
 
 
 if __name__ == "__main__":
-    file = Path(__file__).parent / "converter.json"
     url = "https://www.peak-system.com/fileadmin/media/files/PEAK-Converter.zip"
+    file = Path(__file__).parent / Path(url).with_suffix(".json").name
 
     data = load(file)
     data["url"] = url
 
-    time = modified(url, time=Pendulum(data.get("last-modified", None)))
+    try:
+        mtime = Pendulum(data["last-modified"])
+    except KeyError:
+        mtime = None
+
+    time = modified(url, time=mtime)
 
     if time is None:
         raise SystemExit(1)
