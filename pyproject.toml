@@ -1,17 +1,38 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+
+requires = [ "poetry-core" ]
+
 [tool.poetry]
 name = "peaktrace"
 version = "0.0.0"
 description = "read peak-system can and lin trace files"
-authors = ["Christoph Dörrer <d-chris@web.de>"]
+authors = [ "Christoph Dörrer <d-chris@web.de>" ]
 readme = "README.md"
 license = "MIT"
-include = ["peaktrace/bin/*"]
+include = [ "peaktrace/bin/*" ]
+classifiers = [
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: Microsoft :: Windows",
+]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
-pathlibutil = "^0.1.5"
-pandas = { extras = ["performance", "pyarrow", "plot"], version = "^2.2.1" }
+python = "^3.9"
+pathlibutil = "^0.3.0"
+pandas = { extras = [ "performance", "pyarrow", "plot" ], version = "^2.2.1" }
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.1.1"
+
+[tool.poetry.group.ci.dependencies]
+pathlibutil = "^0.3.0"
+pendulum = "^3.0.0"
+requests = "^2.32.3"
 
 [[tool.poetry.source]]
 name = "PyPI"
@@ -22,25 +43,15 @@ name = "testpypi"
 url = "https://test.pypi.org/legacy/"
 priority = "explicit"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.1.1"
-
-[tool.poetry.group.jupyter.dependencies]
-notebook = "^7.1.2"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = "tests"
 addopts = [
-    "--color=yes",
-    "-s",
-    # "--random-order",
-    # "--cov=peaktrace",
-    # "--cov-report=term-missing:skip-covered",
-    # "--cov-append",
-    # "--cov-report=html",
+  "--color=yes",
+  "-s",
+  # "--random-order",
+  # "--cov=peaktrace",
+  # "--cov-report=term-missing:skip-covered",
+  # "--cov-append",
+  # "--cov-report=html",
 ]
