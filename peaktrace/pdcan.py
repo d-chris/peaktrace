@@ -188,7 +188,7 @@ class CanCsv:
         with Path(__file__).parent:
             subprocess.run(
                 [
-                    "./bin/PEAK-Converter.exe",
+                    "../bin/PEAK-Converter.exe",
                     str(trc),
                     "/TF=CSV",
                     f"/TD={csv.parent}",
